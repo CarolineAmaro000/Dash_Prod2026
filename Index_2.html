@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Produtos de 2026 por Fornecedor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0E1526;
+    --panel:#151E33;
+    --panel-2:#1B2540;
+    --line:#293256;
+    --text:#F2F4F8;
+    --muted:#8A93AC;
+    --amber:#7EC8EF;
+    --amber-dim:#1F3A50;
+    --teal:#2DD9C0;
+    --teal-dim:#173B38;
+    --purple:#A855F7;
+    --purple-dim:#341C50;
+    --gold:#F0A93E;
+    --red:#E8604C;
+    --radius:10px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Inter',sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1180px;margin:0 auto;padding:40px 28px 80px;}
+
+  /* ---------- HEADER ---------- */
+  header{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    flex-wrap:wrap;
+    gap:16px;
+    border-bottom:1px solid var(--line);
+    padding-bottom:24px;
+    margin-bottom:32px;
+  }
+  .eyebrow{
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:var(--amber);
+    margin:0 0 8px;
+  }
+  h1{
+    font-family:'Space Grotesk',sans-serif;
+    font-size:34px;
+    font-weight:700;
+    margin:0;
+    letter-spacing:-0.01em;
+  }
+  .updated{
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    color:var(--muted);
+    text-align:right;
+  }
+
+  /* ---------- KPI ROW ---------- */
+  .kpis{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+    gap:14px;
+    margin-bottom:36px;
+  }
+  .kpi{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:18px 20px;
+    position:relative;
+    overflow:hidden;
+  }
+  .kpi::before{
+    content:'';
+    position:absolute;
+    top:0;left:0;
+    width:3px;height:100%;
+    background:var(--amber);
+  }
+  .kpi-warn::before{background:var(--red);}
+  .kpi .label{
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    color:var(--muted);
+    margin:0 0 8px;
+  }
+  .kpi .value{
+    font-family:'Space Grotesk',sans-serif;
+    font-size:30px;
+    font-weight:700;
+    line-height:1;
+  }
+  .kpi .sub{
+    font-size:12px;
+    color:var(--muted);
+    margin-top:6px;
+  }
+
+  /* ---------- SECTION ---------- */
+  section{margin-bottom:40px;}
+  .section-title{
+    font-family:'Space Grotesk',sans-serif;
+    font-size:16px;
+    font-weight:600;
+    margin:0 0 4px;
+  }
+  .section-sub{
+    font-size:13px;
+    color:var(--muted);
+    margin:0 0 18px;
+  }
+
+  /* ---------- SUPPLIER CARDS / PEGBOARD ---------- */
+  .supplier-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:14px;
+  }
+  .supplier-card{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:18px;
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+  }
+  .supplier-card .name{
+    font-family:'JetBrains Mono',monospace;
+    font-size:13px;
+    letter-spacing:.05em;
+    color:var(--text);
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+  }
+  .supplier-card .name b{
+    font-family:'Space Grotesk',sans-serif;
+    font-size:22px;
+    color:var(--sc);
+  }
+  .peg-grid{
+    display:grid;
+    grid-template-columns:repeat(10,1fr);
+    gap:3px;
+  }
+  .peg{
+    width:100%;
+    aspect-ratio:1;
+    border-radius:2px;
+    background:var(--panel-2);
+    border:1px solid var(--line);
+  }
+  .peg.filled{
+    background:var(--sc);
+    border-color:var(--sc);
+  }
+  .supplier-card .stat-row{
+    display:flex;
+    justify-content:space-between;
+    font-size:12px;
+    color:var(--muted);
+  }
+  .supplier-card .stat-row.first{
+    border-top:1px dashed var(--line);
+    padding-top:10px;
+  }
+  .supplier-card .stat-row span.n{
+    font-family:'JetBrains Mono',monospace;
+    color:var(--sc);
+    font-weight:600;
+  }
+  .supplier-card .stat-row span.n.muted-n{
+    color:var(--text);
+  }
+
+  /* ---------- BAR CHART (saida) ---------- */
+  .bars{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:22px 24px;
+  }
+  .bar-row{
+    display:grid;
+    grid-template-columns:110px 1fr 90px;
+    align-items:center;
+    gap:14px;
+    margin-bottom:14px;
+  }
+  .bar-row:last-child{margin-bottom:0;}
+  .bar-row .fname{
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    color:var(--text);
+  }
+  .bar-track{
+    height:14px;
+    background:var(--panel-2);
+    border-radius:7px;
+    overflow:hidden;
+  }
+  .bar-fill{
+    height:100%;
+    border-radius:7px;
+    background:linear-gradient(90deg, var(--sc-dim, var(--panel-2)), var(--sc));
+    width:0%;
+    transition:width 1s cubic-bezier(.2,.8,.2,1);
+  }
+  .bar-row .bval{
+    font-family:'JetBrains Mono',monospace;
+    font-size:13px;
+    text-align:right;
+    color:var(--sc);
+    font-weight:600;
+  }
+
+  /* ---------- TABLE ---------- */
+  .legend{
+    display:flex;
+    gap:20px;
+    justify-content:center;
+    margin-top:18px;
+    flex-wrap:wrap;
+  }
+  .legend .item{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-size:13px;
+    color:var(--muted);
+  }
+  .legend .swatch{
+    width:11px;height:11px;border-radius:3px;
+  }
+    display:flex;
+    gap:10px;
+    margin-bottom:16px;
+    flex-wrap:wrap;
+  }
+  .tab-btn{
+    -webkit-appearance:none;
+    appearance:none;
+    outline:none;
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    padding:9px 16px;
+    border-radius:999px;
+    border:1px solid var(--line);
+    background-color:var(--panel);
+    color:var(--dc, var(--muted));
+    cursor:pointer;
+    transition:all .15s;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .tab-btn .dot{
+    width:7px;height:7px;border-radius:50%;
+    background-color:var(--dc, var(--muted));
+    flex-shrink:0;
+  }
+  .tab-btn .count{
+    font-size:10px;
+    padding:1px 6px;
+    border-radius:999px;
+    background-color:var(--panel-2);
+    color:var(--dc, var(--muted));
+  }
+  .tab-btn:hover{border-color:var(--dc, var(--line));background-color:var(--panel-2);}
+  .tab-btn.active{
+    background-color:var(--dc-dim, var(--amber-dim));
+    border-color:var(--dc, var(--amber));
+    color:var(--dc, var(--amber));
+  }
+  .tab-btn.active .count{
+    background-color:rgba(255,255,255,0.14);
+    color:var(--dc, var(--amber));
+  }
+  .search-box{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:8px 12px;
+    color:var(--text);
+    font-family:'Inter',sans-serif;
+    font-size:13px;
+    min-width:220px;
+  }
+  .search-box::placeholder{color:var(--muted);}
+  .table-wrap{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    overflow:hidden;
+  }
+  table{width:100%;border-collapse:collapse;font-size:13px;}
+  thead th{
+    text-align:left;
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    color:var(--muted);
+    padding:12px 16px;
+    border-bottom:1px solid var(--line);
+    cursor:pointer;
+    user-select:none;
+    white-space:nowrap;
+  }
+  thead th:hover{color:var(--amber);}
+  thead th.sorted-asc::after{content:' ▲';font-size:9px;color:var(--amber);}
+  thead th.sorted-desc::after{content:' ▼';font-size:9px;color:var(--amber);}
+  tbody td{
+    padding:11px 16px;
+    border-bottom:1px solid var(--line);
+    vertical-align:middle;
+  }
+  tbody tr:last-child td{border-bottom:none;}
+  tbody tr:hover{background:var(--panel-2);}
+  .sku{font-family:'JetBrains Mono',monospace;color:var(--amber);font-size:12px;}
+  .forn-tag{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    padding:2px 8px;
+    border-radius:4px;
+    background:var(--panel-2);
+    border:1px solid var(--line);
+    color:var(--muted);
+    display:inline-block;
+  }
+  .saida-cell{font-family:'JetBrains Mono',monospace;color:var(--teal);text-align:right;}
+  .any-cell{font-family:'JetBrains Mono',monospace;color:var(--text);text-align:right;}
+  .var-cell{font-family:'JetBrains Mono',monospace;color:var(--muted);text-align:center;}
+  .disc-cell{text-align:center;}
+  .disc-flag{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    color:var(--red);
+    background:rgba(232,96,76,0.14);
+    border:1px solid var(--red);
+    padding:3px 8px;
+    border-radius:999px;
+    white-space:nowrap;
+  }
+  .disc-ok{color:var(--muted);}
+  .muted-cell{color:var(--muted);font-size:12px;}
+  footer{
+    text-align:center;
+    font-size:12px;
+    color:var(--muted);
+    margin-top:40px;
+    font-family:'JetBrains Mono',monospace;
+  }
+  @media (max-width:900px){
+    .kpis{grid-template-columns:repeat(2,1fr);}
+    .supplier-grid{grid-template-columns:repeat(2,1fr);}
+  }
+  @media (max-width:560px){
+    .kpis{grid-template-columns:1fr;}
+    .supplier-grid{grid-template-columns:1fr;}
+    .bar-row{grid-template-columns:80px 1fr 60px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div>
+      <h1>Produtos de 2026 por Fornecedor</h1>
+    </div>
+    <div class="updated" id="updated"></div>
+  </header>
+
+  <div class="kpis">
+    <div class="kpi">
+      <p class="label">Produtos novos</p>
+      <div class="value" id="kpi-total">–</div>
+      <p class="sub">solicitados em 2026</p>
+    </div>
+    <div class="kpi">
+      <p class="label">Fornecedores</p>
+      <div class="value" id="kpi-fornecedores">4</div>
+      <p class="sub">HWJ · BOMDER · DP-LUATEK · ONISTEK</p>
+    </div>
+    <div class="kpi">
+      <p class="label">Saída total (12m)</p>
+      <div class="value" id="kpi-saida">–</div>
+      <p class="sub">unidades vendidas, todas as variações</p>
+    </div>
+    <div class="kpi">
+      <p class="label">Maior volume</p>
+      <div class="value" id="kpi-top">–</div>
+      <p class="sub" id="kpi-top-sub">fornecedor com mais itens novos</p>
+    </div>
+    <div class="kpi kpi-warn">
+      <p class="label">Não cadastrados</p>
+      <div class="value" id="kpi-nc">–</div>
+      <p class="sub"><span id="kpi-nc-saida" style="color:var(--red);font-weight:600;"></span></p>
+      <p class="sub" id="kpi-nc-total"></p>
+    </div>
+  </div>
+
+  <section>
+    <p class="section-title">Quantidade de produtos por fornecedor</p>
+    <p class="section-sub">Cada quadrado representa 1 SKU novo cadastrado na aba 2026.</p>
+    <div class="supplier-grid" id="supplier-grid"></div>
+  </section>
+
+  <section>
+    <p class="section-title">Saída acumulada (últimos 12 meses)</p>
+    <p class="section-sub">Soma da coluna L (últimos 12M) da planilha de fluxo — variações de um mesmo SKU somadas pelo prefixo.</p>
+    <div class="bars" id="bars"></div>
+    <div class="legend" id="legend"></div>
+  </section>
+
+  <section>
+    <p class="section-title">Todos os produtos novos</p>
+    <p class="section-sub">Clique nos cabeçalhos para ordenar. Use as abas ou a busca para filtrar.</p>
+    <div class="table-controls" id="tab-controls">
+      <input class="search-box" id="search" placeholder="Buscar SKU ou nome…">
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th data-key="sku">SKU</th>
+            <th data-key="nome">Produto</th>
+            <th data-key="fornecedor">Fornecedor</th>
+            <th data-key="chegada">Chegada</th>
+            <th data-key="cadastro">Cadastro</th>
+            <th data-key="variacoes">Variações</th>
+            <th data-key="any_estoque">Any</th>
+            <th data-key="saida_12m">Saída (12m)</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer>Dados: aba "Visão Geral" (Fluxo de saída por SKU) · coluna F = estoque AnyMarket, coluna L = saída 12M · aba "2026" (Controle) = sinalização de descontinuar · Prefixos de SKU somados para variações (ex.: CQD02-CZ, CQD02-AZR → CQD02)</footer>
+</div>
+
+<script>
+const DATA = [{"fornecedor": "HWJ", "sku": "SNL-H3219", "nome": "PORTA JOIAS LED ESPELHO", "chegada": "22/12/2025", "cadastro": "08/01/2026", "descontinuar": false, "saida_12m": 57, "any_estoque": 0, "variacoes": 4}, {"fornecedor": "HWJ", "sku": "SSH021", "nome": "ESTOJO PARA RELÓGIOS", "chegada": "22/12/2025", "cadastro": "09/01/2026", "descontinuar": true, "saida_12m": 14, "any_estoque": 24, "variacoes": 1}, {"fornecedor": "HWJ", "sku": "GJB19", "nome": "BOLSA DE FERRAMENTAS", "chegada": "19/12/2025", "cadastro": "15/01/2026", "descontinuar": true, "saida_12m": 16, "any_estoque": 23, "variacoes": 1}, {"fornecedor": "BOMDER", "sku": "BOM-3111", "nome": "KIT FERRAMENTAS BOMVINK", "chegada": "15/01/2026", "cadastro": "16/01/2026", "descontinuar": true, "saida_12m": 68, "any_estoque": 0, "variacoes": 1}, {"fornecedor": "HWJ", "sku": "NAC-BY-GU02", "nome": "GUARDA-CHUVA MINI", "chegada": "09/02/2026", "cadastro": "09/02/2026", "descontinuar": true, "saida_12m": 88, "any_estoque": 10, "variacoes": 6}, {"fornecedor": "HWJ", "sku": "CQD02", "nome": "TRAVESSEIRO INFLÁVEL", "chegada": "19/01/2026", "cadastro": "12/02/2026", "descontinuar": true, "saida_12m": 395, "any_estoque": 90, "variacoes": 4}, {"fornecedor": "HWJ", "sku": "SB-310", "nome": "MOCHILA INFANTIL", "chegada": "14/01/2026", "cadastro": "13/02/2026", "descontinuar": true, "saida_12m": 2, "any_estoque": 78, "variacoes": 5}, {"fornecedor": "HWJ", "sku": "B-18", "nome": "MOCHILA GAMER", "chegada": "14/01/2026", "cadastro": "13/02/2026", "descontinuar": true, "saida_12m": 5, "any_estoque": 55, "variacoes": 1}, {"fornecedor": "DP-LUATEK", "sku": "LWJ-ZD108", "nome": "SOLDADOR INVERSOR 220V", "chegada": "20/02/2026", "cadastro": "23/02/2026", "descontinuar": true, "saida_12m": 1, "any_estoque": 4, "variacoes": 1}, {"fornecedor": "HWJ", "sku": "XT01-M", "nome": "CAPA PROTETORA", "chegada": "16/02/2026", "cadastro": "04/03/2026", "descontinuar": true, "saida_12m": 91, "any_estoque": 24, "variacoes": 2}, {"fornecedor": "HWJ", "sku": "GJB16", "nome": "BOLSA DE FERRAMENTAS", "chegada": "19/12/2025", "cadastro": "14/01/2026", "descontinuar": false, "saida_12m": 563, "any_estoque": 136, "variacoes": 1}, {"fornecedor": "HWJ", "sku": "GJB20", "nome": "MOCHILA DE FERRAMENTAS", "chegada": "19/12/2025", "cadastro": "15/01/2026", "descontinuar": false, "saida_12m": 605, "any_estoque": 112, "variacoes": 1}, {"fornecedor": "HWJ", "sku": "HZB-6126", "nome": "BOLSA TRANSPARENTEBolsa Transparente", "chegada": "19/12/2025", "cadastro": "15/01/2026", "descontinuar": false, "saida_12m": 379, "any_estoque": 24, "variacoes": 6}, {"fornecedor": "HWJ", "sku": "FSL342-WZ", "nome": "MOCHILA ESPORTIVA ACADEMIA", "chegada": "19/12/2025", "cadastro": "15/01/2026", "descontinuar": false, "saida_12m": 2078, "any_estoque": 85, "variacoes": 8}, {"fornecedor": "HWJ", "sku": "SNL-3223", "nome": "CASE ORGANIZADOR", "chegada": "22/12/2025", "cadastro": "15/01/2026", "descontinuar": false, "saida_12m": 653, "any_estoque": 243, "variacoes": 1}, {"fornecedor": "BOMDER", "sku": "BOM-6502", "nome": "PAQUIMETRO MANUAL", "chegada": "15/01/2026", "cadastro": "16/01/2026", "descontinuar": false, "saida_12m": 204, "any_estoque": 195, "variacoes": 1}, {"fornecedor": "BOMDER", "sku": "BOM-5572", "nome": "PINO 10MM", "chegada": "16/01/2026", "cadastro": "23/01/2026", "descontinuar": false, "saida_12m": 89, "any_estoque": 35, "variacoes": 1}, {"fornecedor": "BOMDER", "sku": "BOM-3405", "nome": "JOGO LIMAS 6 PEÇAS", "chegada": "16/01/2026", "cadastro": "29/01/2026", "descontinuar": false, "saida_12m": 794, "any_estoque": 165, "variacoes": 1}, {"fornecedor": "BOMDER", "sku": "BOM-5573", "nome": "KIT 5000 GRAMPOS 10MM", "chegada": "16/01/2026", "cadastro": "30/01/2026", "descontinuar": false, "saida_12m": 190, "any_estoque": 27, "variacoes": 1}, {"fornecedor": "HWJ", "sku": "BWB-5126", "nome": "Mochila Térmica Verão", "chegada": "19/01/2026", "cadastro": "13/02/2026", "descontinuar": false, "saida_12m": 52, "any_estoque": 0, "variacoes": 3}, {"fornecedor": "BOMDER", "sku": "BOM-1648", "nome": "TESOURA PARA CORTAR", "chegada": "30/01/2026", "cadastro": "17/02/2026", "descontinuar": false, "saida_12m": 47, "any_estoque": 11, "variacoes": 1}, {"fornecedor": "BOMDER", "sku": "BOM-1504", "nome": "VENTOSA DUPLA", "chegada": "10/02/2026", "cadastro": "19/02/2026", "descontinuar": false, "saida_12m": 132, "any_estoque": 32, "variacoes": 1}, {"fornecedor": "BOMDER", "sku": "BOM-5533", "nome": "KIT COM 120 FUSÍVEIS AUTOMOTIVOS", "chegada": "10/02/2026", "cadastro": "24/02/2026", "descontinuar": false, "saida_12m": 200, "any_estoque": 94, "variacoes": 1}, {"fornecedor": "BOMDER", "sku": "BOM-1533", "nome": "SERROTE DOBRÁVEL 7 POLEGADAS", "chegada": "20/02/2026", "cadastro": "25/02/2026", "descontinuar": false, "saida_12m": 149, "any_estoque": 65, "variacoes": 1}, {"fornecedor": "BOMDER", "sku": "BOM-6811", "nome": "TORQUÍMETRO DIGITAL", "chegada": "20/02/2026", "cadastro": "26/02/2026", "descontinuar": false, "saida_12m": 165, "any_estoque": 44, "variacoes": 1}, {"fornecedor": "BOMDER", "sku": "BOM-6250", "nome": "NÍVEL DE MÃO COM 2 BOLHAS-ALUMÍNIO", "chegada": "20/02/2026", "cadastro": "26/02/2026", "descontinuar": false, "saida_12m": 284, "any_estoque": 124, "variacoes": 1}, {"fornecedor": "BOMDER", "sku": "BOM-6517", "nome": "MICROMETRO EXTERNOA NALÓGICO 0-25MM", "chegada": "20/02/2026", "cadastro": "26/02/2026", "descontinuar": false, "saida_12m": 94, "any_estoque": 52, "variacoes": 1}, {"fornecedor": "BOMDER", "sku": "BOM-1538", "nome": "CHAVE EXTRATOR DE CORRENTE", "chegada": "20/02/2026", "cadastro": "27/02/2026", "descontinuar": false, "saida_12m": 386, "any_estoque": 211, "variacoes": 1}, {"fornecedor": "BOMDER", "sku": "BOM-3306", "nome": "CORTE DE PLACA DE GESSO,DRYWALL COM TRENA 5M", "chegada": "20/02/2026", "cadastro": "27/02/2026", "descontinuar": false, "saida_12m": 73, "any_estoque": 47, "variacoes": 1}, {"fornecedor": "HWJ", "sku": "CQD04", "nome": "ALMOFADA LOMBAR", "chegada": "16/02/2026", "cadastro": "04/03/2026", "descontinuar": false, "saida_12m": 231, "any_estoque": 161, "variacoes": 2}, {"fornecedor": "HWJ", "sku": "SN-10", "nome": "SACO LAVAGEM TÊNIS", "chegada": "23/02/2026", "cadastro": "03/03/2026", "descontinuar": false, "saida_12m": 207, "any_estoque": 190, "variacoes": 2}, {"fornecedor": "HWJ", "sku": "SN-009", "nome": "ORGANIZADOR CESTA FELTRO", "chegada": "23/02/2026", "cadastro": "03/03/2026", "descontinuar": false, "saida_12m": 1000, "any_estoque": 0, "variacoes": 5}, {"fornecedor": "BOMDER", "sku": "BOM-3631", "nome": "PISTOLA DE PREGOS", "chegada": "04/03/2026", "cadastro": "06/03/2026", "descontinuar": false, "saida_12m": 16, "any_estoque": 15, "variacoes": 1}, {"fornecedor": "BOMDER", "sku": "BOM-9712", "nome": "FERRAMENTAS 6 EM 1", "chegada": "04/03/2026", "cadastro": "09/03/2026", "descontinuar": false, "saida_12m": 19, "any_estoque": 10, "variacoes": 1}, {"fornecedor": "BOMDER", "sku": "BOM-7410", "nome": "PROTETOR ABAFADOR DE RUIDOS", "chegada": "04/03/2026", "cadastro": "06/03/2026", "descontinuar": false, "saida_12m": 50, "any_estoque": 0, "variacoes": 1}, {"fornecedor": "HWJ", "sku": "GJB-18", "nome": "MALETA ORGANIZADORA DUPLA FACE", "chegada": "06/03/2026", "cadastro": "17/03/2026", "descontinuar": false, "saida_12m": 250, "any_estoque": 0, "variacoes": 1}, {"fornecedor": "BOMDER", "sku": "BOM-9624", "nome": "LIXADEIRA DE PAREDE", "chegada": "06/03/2026", "cadastro": "25/03/2026", "descontinuar": false, "saida_12m": 7, "any_estoque": 4, "variacoes": 1}, {"fornecedor": "BOMDER", "sku": "BOM-1244", "nome": "TORQUIMETRO DE ESTALO 1/4", "chegada": "06/03/2026", "cadastro": "17/03/2026", "descontinuar": false, "saida_12m": 10, "any_estoque": 0, "variacoes": 1}, {"fornecedor": "DP-LUATEK", "sku": "LK-293", "nome": "CANHÃO DE LUZ", "chegada": "13/03/2026", "cadastro": "24/03/2026", "descontinuar": false, "saida_12m": 8, "any_estoque": 2, "variacoes": 1}, {"fornecedor": "DP-LUATEK", "sku": "DP-7320", "nome": "LANTERNA HOLOFOTE", "chegada": "17/03/2026", "cadastro": "24/03/2026", "descontinuar": false, "saida_12m": 47, "any_estoque": 1, "variacoes": 1}, {"fornecedor": "ONISTEK", "sku": "ON-MF809-220V", "nome": "MAQUINA DE NEVE", "chegada": "17/03/2026", "cadastro": "24/03/2026", "descontinuar": false, "saida_12m": 0, "any_estoque": 6, "variacoes": 1}, {"fornecedor": "DP-LUATEK", "sku": "LWJ-137", "nome": "KIT DE FERRAMENTAS", "chegada": "17/03/2026", "cadastro": "09/04/2026", "descontinuar": false, "saida_12m": 0, "any_estoque": 10, "variacoes": 1}, {"fornecedor": "HWJ", "sku": "DNB-60", "nome": "CAPA NOTEBOOK PUFF", "chegada": "17/03/2026", "cadastro": "10/04/2026", "descontinuar": false, "saida_12m": 34, "any_estoque": 144, "variacoes": 4}, {"fornecedor": "HWJ", "sku": "EVA-1", "nome": "CASE PORTATIL CONTROLE", "chegada": "06/04/2026", "cadastro": "14/04/2026", "descontinuar": false, "saida_12m": 155, "any_estoque": 113, "variacoes": 1}, {"fornecedor": "DP-LUATEK", "sku": "LK-Y5-220V", "nome": "MAQUINA FUMAÇA 600W", "chegada": "31/03/2026", "cadastro": "15/04/2026", "descontinuar": false, "saida_12m": 2, "any_estoque": 18, "variacoes": 1}, {"fornecedor": "HWJ", "sku": "SN-13", "nome": "NECESSAIRE PUFF", "chegada": "06/04/2026", "cadastro": "22/04/2026", "descontinuar": false, "saida_12m": 80, "any_estoque": 0, "variacoes": 5}, {"fornecedor": "BOMDER", "sku": "BOM-1709", "nome": "ALICATE ESPECIAL", "chegada": "15/04/2026", "cadastro": "17/04/2026", "descontinuar": false, "saida_12m": 5, "any_estoque": 67, "variacoes": 1}, {"fornecedor": "BOMDER", "sku": "BOM-3110", "nome": "KIT CHAVES ISOLADAS PARA ELETRICISTA", "chegada": "15/04/2026", "cadastro": "17/04/2026", "descontinuar": false, "saida_12m": 27, "any_estoque": 33, "variacoes": 1}, {"fornecedor": "BOMDER", "sku": "BOM-9546", "nome": "ESMERILHADEIRA ANGULAR 220", "chegada": "15/04/2026", "cadastro": "20/04/2026", "descontinuar": false, "saida_12m": 2, "any_estoque": 7, "variacoes": 1}, {"fornecedor": "BOMDER", "sku": "BOM-6201", "nome": "NIVELADOR A LASER PROFISSIONAL TRENA", "chegada": "15/04/2026", "cadastro": "20/04/2026", "descontinuar": false, "saida_12m": 22, "any_estoque": 58, "variacoes": 1}, {"fornecedor": "HWJ", "sku": "ZJ04", "nome": "TRAVESSEIRO PESCOÇO VIAGEM", "chegada": "27/04/2026", "cadastro": "05/05/2026", "descontinuar": false, "saida_12m": 59, "any_estoque": 39, "variacoes": 5}, {"fornecedor": "HWJ", "sku": "ZJ03", "nome": "KIT TRAVESSEIRO E MASCARA", "chegada": "06/04/2026", "cadastro": "05/05/2026", "descontinuar": false, "saida_12m": 96, "any_estoque": 1, "variacoes": 5}, {"fornecedor": "HWJ", "sku": "GJB05", "nome": "BOLSA DE LONA FERRAMENTAS", "chegada": "06/04/2026", "cadastro": "13/05/2026", "descontinuar": false, "saida_12m": 101, "any_estoque": 498, "variacoes": 1}, {"fornecedor": "HWJ", "sku": "SN-12", "nome": "BOLSA PARA CAMERA FOTOGRAFICA", "chegada": "17/04/2026", "cadastro": "13/05/2026", "descontinuar": false, "saida_12m": 163, "any_estoque": 252, "variacoes": 2}, {"fornecedor": "HWJ", "sku": "HZB-6137", "nome": "NECESSAIRE COURO", "chegada": "17/04/2026", "cadastro": "13/05/2026", "descontinuar": false, "saida_12m": 201, "any_estoque": 0, "variacoes": 3}, {"fornecedor": "BOMDER", "sku": "BOM-1625", "nome": "CORTADOR DE TUBOS PVC MANUAL-42MM", "chegada": "23/04/2026", "cadastro": "26/05/2026", "descontinuar": false, "saida_12m": 9, "any_estoque": 51, "variacoes": 1}, {"fornecedor": "BOMDER", "sku": "BOM-1610", "nome": "ALICATE BOMBA D’ÁGUA", "chegada": "23/04/2026", "cadastro": "25/05/2026", "descontinuar": false, "saida_12m": 3, "any_estoque": 57, "variacoes": 1}, {"fornecedor": "HWJ", "sku": "B-BL4214", "nome": "MOCHILA RAQUETEIRA TENNIS", "chegada": "12/05/2026", "cadastro": "08/06/2026", "descontinuar": false, "saida_12m": 5, "any_estoque": 95, "variacoes": 6}, {"fornecedor": "HWJ", "sku": "FSL341", "nome": "BOLSA CASUAL COTIDIANO GRANDE", "chegada": "13/05/2026", "cadastro": "12/06/2026", "descontinuar": false, "saida_12m": 0, "any_estoque": 120, "variacoes": 5}, {"fornecedor": "HWJ", "sku": "QPB03", "nome": "BOLSA TENNIS ESPORTIVO IMPERMEÁVEL", "chegada": "13/05/2026", "cadastro": "09/06/2026", "descontinuar": false, "saida_12m": 10, "any_estoque": 90, "variacoes": 6}, {"fornecedor": "HWJ", "sku": "QPB01", "nome": "BOLSA TENNIS ESPORTIVO IMPERMEÁVEL", "chegada": "13/05/2026", "cadastro": "11/06/2026", "descontinuar": false, "saida_12m": 9, "any_estoque": 141, "variacoes": 6}, {"fornecedor": "HWJ", "sku": "SN-007", "nome": "ORGANIZADOR DOBRÁVEL MÉDIO", "chegada": "13/05/2026", "cadastro": "19/06/2026", "descontinuar": false, "saida_12m": 5, "any_estoque": 194, "variacoes": 3}, {"fornecedor": "HWJ", "sku": "ZJ05", "nome": "TRAVESSEIRO PREENCHIVEL PESO EXTRA", "chegada": "15/05/2026", "cadastro": "22/06/2026", "descontinuar": false, "saida_12m": 20, "any_estoque": 278, "variacoes": 6}, {"fornecedor": "HWJ", "sku": "GJB17", "nome": "CESTA MULTIUSO FERRAMENTA", "chegada": "13/05/2026", "cadastro": "26/06/2026", "descontinuar": false, "saida_12m": 1, "any_estoque": 59, "variacoes": 1}, {"fornecedor": "HWJ", "sku": "BWB3", "nome": "MOCHILA TÉRMICA MOTOBOY", "chegada": "17/04/2026", "cadastro": "Não Cadastrado", "descontinuar": false, "saida_12m": 0, "any_estoque": 0, "variacoes": 1}, {"fornecedor": "HWJ", "sku": "BT01-P", "nome": "BOLSA PORTA GARRAFA", "chegada": "27/04/2026", "cadastro": "Não Cadastrado", "descontinuar": false, "saida_12m": 0, "any_estoque": 200, "variacoes": 1}, {"fornecedor": "HWJ", "sku": "BWB2", "nome": "MOCHILA TÉRMICA MOTOBOY GRANDE", "chegada": "12/05/2026", "cadastro": "Não Cadastrado", "descontinuar": false, "saida_12m": 0, "any_estoque": 50, "variacoes": 1}, {"fornecedor": "HWJ", "sku": "YP1", "nome": "ORGANIZADOR VIAGEM CARTÃO DOC", "chegada": "13/05/2026", "cadastro": "Não Cadastrado", "descontinuar": false, "saida_12m": 0, "any_estoque": 100, "variacoes": 1}, {"fornecedor": "HWJ", "sku": "SNL-YH02", "nome": "ORGANIZADOR REMEDIO", "chegada": "27/05/2026", "cadastro": "Não Cadastrado", "descontinuar": false, "saida_12m": 0, "any_estoque": 80, "variacoes": 1}, {"fornecedor": "HWJ", "sku": "SN-13-CASE", "nome": "CASE SWITCH 2 COM DIVISÓRIAS", "chegada": "11/06/2026", "cadastro": "Não Cadastrado", "descontinuar": false, "saida_12m": 0, "any_estoque": 0, "variacoes": 1}, {"fornecedor": "HWJ", "sku": "ZXD01", "nome": "TORNIQUETE TÁTICO", "chegada": "12/06/2026", "cadastro": "Não Cadastrado", "descontinuar": false, "saida_12m": 13, "any_estoque": 187, "variacoes": 1}, {"fornecedor": "HWJ", "sku": "GJD01", "nome": "CINTO PARA ROÇADEIRA", "chegada": "12/06/2026", "cadastro": "Não Cadastrado", "descontinuar": false, "saida_12m": 0, "any_estoque": 50, "variacoes": 1}, {"fornecedor": "BOMDER", "sku": "BOM-6521", "nome": "NÍVEL MANUAL COM RÉGUA DE 50 CM", "chegada": "09/06/2026", "cadastro": "Não Cadastrado", "descontinuar": false, "saida_12m": 5, "any_estoque": 55, "variacoes": 1}, {"fornecedor": "BOMDER", "sku": "BOM-6522", "nome": "NÍVEL DE BOLHA DOBRÁVEL COM BASE MAGNÉTICA - 30CM", "chegada": "09/06/2026", "cadastro": "Não Cadastrado", "descontinuar": false, "saida_12m": 1, "any_estoque": 39, "variacoes": 1}, {"fornecedor": "BOMDER", "sku": "BOM-6538", "nome": "MEDIDOR DE CONTORNO 5 POLEGADAS", "chegada": "09/06/2026", "cadastro": "Não Cadastrado", "descontinuar": false, "saida_12m": 0, "any_estoque": 36, "variacoes": 1}, {"fornecedor": "BOMDER", "sku": "BOM-6812", "nome": "TORQUÍMETRO DE ÂNGULO", "chegada": "09/06/2026", "cadastro": "Não Cadastrado", "descontinuar": false, "saida_12m": 6, "any_estoque": 44, "variacoes": 1}, {"fornecedor": "BOMDER", "sku": "BOM-9557", "nome": "FURADEIRA E MARTELETE COM IMPACTO", "chegada": "09/06/2026", "cadastro": "Não Cadastrado", "descontinuar": false, "saida_12m": 0, "any_estoque": 0, "variacoes": 1}, {"fornecedor": "BOMDER", "sku": "BOM-9558", "nome": "FURADEIRA E MARTELETE COM IMPACTO", "chegada": "09/06/2026", "cadastro": "Não Cadastrado", "descontinuar": false, "saida_12m": 0, "any_estoque": 0, "variacoes": 1}, {"fornecedor": "BOMDER", "sku": "BOM-9734", "nome": "VENTOSA DE SUCÇÃO COM BOMBA DE VÁCUO A BATERIA 200KG", "chegada": "09/06/2026", "cadastro": "Não Cadastrado", "descontinuar": false, "saida_12m": 0, "any_estoque": 10, "variacoes": 1}, {"fornecedor": "BOMDER", "sku": "BOM-1611", "nome": "ALICATE DE BICO REDONDO", "chegada": "09/06/2026", "cadastro": "Não Cadastrado", "descontinuar": false, "saida_12m": 32, "any_estoque": 40, "variacoes": 1}, {"fornecedor": "BOMDER", "sku": "BOM-3608", "nome": "KIT 6 PÇS ESQUADRO MAGNÉTICO PARA SOLDA", "chegada": "09/06/2026", "cadastro": "Não Cadastrado", "descontinuar": false, "saida_12m": 8, "any_estoque": 12, "variacoes": 1}, {"fornecedor": "HWJ", "sku": "SN17", "nome": "BOLSA PORTÁTIL GARRAFA VINHO", "chegada": "15/06/2026", "cadastro": "Não Cadastrado", "descontinuar": false, "saida_12m": 0, "any_estoque": 0, "variacoes": 3}, {"fornecedor": "DP-LUATEK", "sku": "SLK-A64", "nome": "FACÃO DE SOBREVIVENCIA AÇO INOX", "chegada": "09/06/2026", "cadastro": "Não Cadastrado", "descontinuar": false, "saida_12m": 0, "any_estoque": 0, "variacoes": 1}, {"fornecedor": "DP-LUATEK", "sku": "DP-7856", "nome": "LÂMPADA DE EMERGÊNCIA 38W", "chegada": "09/06/2026", "cadastro": "Não Cadastrado", "descontinuar": false, "saida_12m": 0, "any_estoque": 0, "variacoes": 1}, {"fornecedor": "DP-LUATEK", "sku": "LP-001-220V", "nome": "LAMPADA FLUORESCENTE LUZ NEGRA 220V", "chegada": "09/06/2026", "cadastro": "Não Cadastrado", "descontinuar": false, "saida_12m": 0, "any_estoque": 0, "variacoes": 1}, {"fornecedor": "DP-LUATEK", "sku": "LK-2098", "nome": "HIGIENIZADOR NASAL", "chegada": "12/06/2026", "cadastro": "Não Cadastrado", "descontinuar": false, "saida_12m": 76, "any_estoque": 284, "variacoes": 1}, {"fornecedor": "DP-LUATEK", "sku": "LK-5076", "nome": "XADREZ INTERNACIONAL", "chegada": "12/06/2026", "cadastro": "Não Cadastrado", "descontinuar": false, "saida_12m": 0, "any_estoque": 0, "variacoes": 1}, {"fornecedor": "BOMDER", "sku": "BOM-6532", "nome": "PAQUIMETRO ANALOGICO", "chegada": "12/06/2026", "cadastro": "Não Cadastrado", "descontinuar": false, "saida_12m": 57, "any_estoque": 42, "variacoes": 1}, {"fornecedor": "BOMDER", "sku": "BOM-1647", "nome": "TESOURA PARA CORTAR VERGALHÃO 14\"", "chegada": "12/06/2026", "cadastro": "Não Cadastrado", "descontinuar": false, "saida_12m": 1, "any_estoque": 29, "variacoes": 1}, {"fornecedor": "BOMDER", "sku": "BOM-5534", "nome": "KIT COM 306 FUSÍVEIS AUTOMOTIVOS", "chegada": "12/06/2026", "cadastro": "Não Cadastrado", "descontinuar": false, "saida_12m": 0, "any_estoque": 60, "variacoes": 1}, {"fornecedor": "BOMDER", "sku": "BOM-1574", "nome": "CORTADOR DE VIDRO", "chegada": "25/06/2026", "cadastro": "Não Cadastrado", "descontinuar": false, "saida_12m": 0, "any_estoque": 240, "variacoes": 1}, {"fornecedor": "BOMDER", "sku": "BOM-3305", "nome": "TESOURA PARA CHAPA", "chegada": "25/06/2026", "cadastro": "Não Cadastrado", "descontinuar": false, "saida_12m": 0, "any_estoque": 0, "variacoes": 1}, {"fornecedor": "BOMDER", "sku": "BOM-3708", "nome": "KIT ALICATES PARA ANÉIS 7\" COM 4 PEÇAS", "chegada": "25/06/2026", "cadastro": "Não Cadastrado", "descontinuar": false, "saida_12m": 0, "any_estoque": 36, "variacoes": 1}, {"fornecedor": "BOMDER", "sku": "BOM-9217", "nome": "MOTOR DE POPA A GASOLINA 52CC", "chegada": "25/06/2026", "cadastro": "Não Cadastrado", "descontinuar": false, "saida_12m": 0, "any_estoque": 0, "variacoes": 1}, {"fornecedor": "BOMDER", "sku": "BOM-6519", "nome": "MEDIDOR DIGITAL SULCO PNEU", "chegada": "25/06/2026", "cadastro": "Não Cadastrado", "descontinuar": false, "saida_12m": 4, "any_estoque": 96, "variacoes": 1}, {"fornecedor": "BOMDER", "sku": "BOM-1710", "nome": "ALICATE PRENSA TERMINAL", "chegada": "25/06/2026", "cadastro": "Não Cadastrado", "descontinuar": false, "saida_12m": 0, "any_estoque": 50, "variacoes": 1}, {"fornecedor": "DP-LUATEK", "sku": "LK-294", "nome": "MOVING 18 LEDS", "chegada": "29/06/2026", "cadastro": "Não Cadastrado", "descontinuar": false, "saida_12m": 0, "any_estoque": 0, "variacoes": 1}, {"fornecedor": "BOMDER", "sku": "BOM-3201", "nome": "JOGO DE CHAVE ALLEN ABAULADA 9PC", "chegada": "não chegou", "cadastro": "Não Cadastrado", "descontinuar": false, "saida_12m": 0, "any_estoque": 0, "variacoes": 1}, {"fornecedor": "BOMDER", "sku": "BOM-5543", "nome": "KIT FUSIVEL CARRO AUTOMOTIVO GRANDE", "chegada": "não chegou", "cadastro": "Não Cadastrado", "descontinuar": false, "saida_12m": 0, "any_estoque": 0, "variacoes": 1}, {"fornecedor": "DP-LUATEK", "sku": "MXH-9903", "nome": "KIT DE COSTURA", "chegada": "não chegou", "cadastro": "Não Cadastrado", "descontinuar": false, "saida_12m": 0, "any_estoque": 0, "variacoes": 0}, {"fornecedor": "DP-LUATEK", "sku": "SLK-F02", "nome": "PULSEIRA MULTIFUNCIONAL", "chegada": "não chegou", "cadastro": "Não Cadastrado", "descontinuar": false, "saida_12m": 0, "any_estoque": 0, "variacoes": 0}];
+
+const FORN_ORDER = ['HWJ','BOMDER','DP-LUATEK','ONISTEK'];
+const SUPPLIER_COLOR = {
+  'HWJ':'#7EC8EF',
+  'BOMDER':'#A855F7',
+  'DP-LUATEK':'#2DD9C0',
+  'ONISTEK':'#F0A93E'
+};
+function hexToRgba(hex, a){
+  const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+  return `rgba(${r},${g},${b},${a})`;
+}
+
+function fmt(n){ return n.toLocaleString('pt-BR'); }
+
+// KPIs
+document.getElementById('kpi-total').textContent = fmt(DATA.length);
+const totalSaida = DATA.reduce((a,b)=>a+b.saida_12m,0);
+document.getElementById('kpi-saida').textContent = fmt(totalSaida);
+const totalAny = DATA.reduce((a,b)=>a+b.any_estoque,0);
+
+const bySupplier = {};
+FORN_ORDER.forEach(f=>bySupplier[f]={qtd:0,saida:0,any:0,descontinuar:0});
+DATA.forEach(d=>{
+  if(!bySupplier[d.fornecedor]) bySupplier[d.fornecedor]={qtd:0,saida:0,any:0,descontinuar:0};
+  bySupplier[d.fornecedor].qtd++;
+  bySupplier[d.fornecedor].saida+=d.saida_12m;
+  bySupplier[d.fornecedor].any+=d.any_estoque;
+  if(d.descontinuar) bySupplier[d.fornecedor].descontinuar++;
+});
+
+const topSupplier = Object.entries(bySupplier).sort((a,b)=>b[1].qtd-a[1].qtd)[0];
+document.getElementById('kpi-top').textContent = topSupplier[0];
+document.getElementById('kpi-top-sub').textContent = `${topSupplier[1].qtd} produtos novos`;
+
+const naoCadastrados = DATA.filter(d => d.cadastro.trim().toLowerCase() === 'não cadastrado');
+const naoCadastradosComSaida = naoCadastrados.filter(d => d.saida_12m > 0);
+const naoCadastradosTotalSaida = naoCadastradosComSaida.reduce((a,b)=>a+b.saida_12m,0);
+document.getElementById('kpi-nc').textContent = fmt(naoCadastrados.length);
+document.getElementById('kpi-nc-saida').textContent = `${naoCadastradosComSaida.length} já venderam sem cadastro`;
+document.getElementById('kpi-nc-total').textContent = `${fmt(naoCadastradosTotalSaida)} unidades vendidas no total`;
+
+document.getElementById('updated').innerHTML = 'Atualizado em<br>' + new Date().toLocaleDateString('pt-BR');
+
+// Supplier pegboard cards
+const grid = document.getElementById('supplier-grid');
+FORN_ORDER.forEach(f=>{
+  const s = bySupplier[f];
+  const card = document.createElement('div');
+  card.className='supplier-card';
+  card.style.setProperty('--sc', SUPPLIER_COLOR[f]);
+  let pegs = '';
+  for(let i=0;i<Math.max(s.qtd,10);i++){
+    pegs += `<div class="peg ${i<s.qtd?'filled':''}"></div>`;
+  }
+  card.innerHTML = `
+    <div class="name">${f} <b>${s.qtd}</b></div>
+    <div class="peg-grid">${pegs}</div>
+    <div class="stat-row first"><span>saída 12m</span><span class="n">${fmt(s.saida)}</span></div>
+    <div class="stat-row"><span>estoque any</span><span class="n muted-n">${fmt(s.any)}</span></div>
+  `;
+  grid.appendChild(card);
+});
+
+// Bars (saida)
+const bars = document.getElementById('bars');
+const maxSaida = Math.max(...FORN_ORDER.map(f=>bySupplier[f].saida), 1);
+FORN_ORDER.forEach(f=>{
+  const s = bySupplier[f];
+  const row = document.createElement('div');
+  row.className='bar-row';
+  row.style.setProperty('--sc', SUPPLIER_COLOR[f]);
+  row.style.setProperty('--sc-dim', hexToRgba(SUPPLIER_COLOR[f], 0.25));
+  row.innerHTML = `
+    <div class="fname">${f}</div>
+    <div class="bar-track"><div class="bar-fill" data-w="${(s.saida/maxSaida*100).toFixed(1)}"></div></div>
+    <div class="bval">${fmt(s.saida)}</div>
+  `;
+  bars.appendChild(row);
+});
+requestAnimationFrame(()=>{
+  document.querySelectorAll('.bar-fill').forEach(el=>{
+    el.style.width = el.dataset.w + '%';
+  });
+});
+
+const legend = document.getElementById('legend');
+FORN_ORDER.forEach(f=>{
+  const item = document.createElement('div');
+  item.className='item';
+  item.innerHTML = `<span class="swatch" style="background:${SUPPLIER_COLOR[f]}"></span>${f}`;
+  legend.appendChild(item);
+});
+
+// Table controls: dynamic supplier tabs with color + count
+const tabControls = document.getElementById('tab-controls');
+const searchInput = document.getElementById('search');
+
+function makeTabBtn(forn, label, count, color){
+  const btn = document.createElement('button');
+  btn.className = 'tab-btn' + (forn==='ALL' ? ' active' : '');
+  btn.dataset.forn = forn;
+  if(color){
+    btn.style.setProperty('--dc', color);
+    btn.style.setProperty('--dc-dim', hexToRgba(color, 0.16));
+  }
+  btn.innerHTML = `${color?`<span class="dot"></span>`:''}${label}<span class="count">${count}</span>`;
+  return btn;
+}
+
+const allBtn = makeTabBtn('ALL','Todos', DATA.length, null);
+tabControls.appendChild(allBtn);
+FORN_ORDER.forEach(f=>{
+  const btn = makeTabBtn(f, f, bySupplier[f].qtd, SUPPLIER_COLOR[f]);
+  tabControls.appendChild(btn);
+});
+
+// Date parsing helper: "dd/mm/yyyy" -> timestamp, invalid/missing -> null
+function parseDateBR(str){
+  if(!str) return null;
+  const m = str.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if(!m) return null;
+  const d = new Date(parseInt(m[3]), parseInt(m[2])-1, parseInt(m[1]));
+  return isNaN(d.getTime()) ? null : d.getTime();
+}
+
+const DATE_KEYS = new Set(['chegada','cadastro']);
+const NUM_KEYS = new Set(['saida_12m','variacoes','any_estoque']);
+const BOOL_KEYS = new Set(['descontinuar']);
+
+// Table
+let currentFilter = 'ALL';
+let currentSearch = '';
+let sortKey = 'saida_12m';
+let sortDir = -1;
+
+function updateSortIndicators(){
+  document.querySelectorAll('thead th').forEach(th=>{
+    th.classList.remove('sorted-asc','sorted-desc');
+    if(th.dataset.key===sortKey){
+      th.classList.add(sortDir===1 ? 'sorted-asc' : 'sorted-desc');
+    }
+  });
+}
+
+function renderTable(){
+  const tbody = document.getElementById('tbody');
+  tbody.innerHTML='';
+  let rows = DATA.filter(d=>{
+    if(currentFilter!=='ALL' && d.fornecedor!==currentFilter) return false;
+    if(currentSearch){
+      const q = currentSearch.toLowerCase();
+      if(!d.sku.toLowerCase().includes(q) && !d.nome.toLowerCase().includes(q)) return false;
+    }
+    return true;
+  });
+
+  rows.sort((a,b)=>{
+    if(DATE_KEYS.has(sortKey)){
+      const ta = parseDateBR(a[sortKey]), tb = parseDateBR(b[sortKey]);
+      if(ta===null && tb===null) return 0;
+      if(ta===null) return 1;
+      if(tb===null) return -1;
+      return (ta-tb)*sortDir;
+    }
+    if(NUM_KEYS.has(sortKey)){
+      return (a[sortKey]-b[sortKey])*sortDir;
+    }
+    if(BOOL_KEYS.has(sortKey)){
+      return (Number(a[sortKey])-Number(b[sortKey]))*sortDir;
+    }
+    const av = String(a[sortKey]).toLowerCase(), bv = String(b[sortKey]).toLowerCase();
+    return av.localeCompare(bv,'pt-BR')*sortDir;
+  });
+
+  rows.forEach(d=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td class="sku">${d.sku}</td>
+      <td>${d.nome}</td>
+      <td><span class="forn-tag">${d.fornecedor}</span></td>
+      <td class="muted-cell">${d.chegada || '—'}</td>
+      <td class="muted-cell">${d.cadastro || '—'}</td>
+      <td class="var-cell">${d.variacoes}</td>
+      <td class="any-cell">${fmt(d.any_estoque)}</td>
+      <td class="saida-cell">${fmt(d.saida_12m)}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+  updateSortIndicators();
+}
+
+tabControls.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    tabControls.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    currentFilter = btn.dataset.forn;
+    renderTable();
+  });
+});
+
+searchInput.addEventListener('input', e=>{
+  currentSearch = e.target.value;
+  renderTable();
+});
+
+document.querySelectorAll('thead th').forEach(th=>{
+  th.addEventListener('click', ()=>{
+    const key = th.dataset.key;
+    if(sortKey===key){
+      sortDir*=-1;
+    } else {
+      sortKey=key;
+      // sensible default direction per column type
+      if(DATE_KEYS.has(key)) sortDir = 1;       // oldest -> newest first
+      else if(NUM_KEYS.has(key)) sortDir = -1;  // highest first
+      else sortDir = 1;                         // A -> Z first
+    }
+    renderTable();
+  });
+});
+
+renderTable();
+</script>
+</body>
+</html>
